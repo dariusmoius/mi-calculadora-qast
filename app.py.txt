@@ -1,0 +1,14 @@
+import streamlit as st
+import numpy as np
+
+st.title("Calculadora Cosmológica Q.A.S.T.")
+
+v = st.number_input("Velocidad Peculiar (km/s)", value=0.0)
+r = st.number_input("Rotación Observador", value=240.0)
+
+if st.button("Calcular"):
+    actividad = (abs(v) / r) * 100
+    h0 = 67.4 + (2.3 * np.log10(1 + actividad))
+    
+    st.metric("H0 Aparente", f"{h0:.2f} km/s/Mpc")
+    st.write(f"Nivel de Actividad: {actividad:.2f}%")
