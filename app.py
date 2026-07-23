@@ -1,7 +1,9 @@
 import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
-
+if st.button("Mostrar datos curiosos"):
+    st.info("La constante de Hubble fue nombrada por Edwin Hubble.")
+    st.balloons() # ¡Esto lanza globos en la pantalla!
 st.set_page_config(page_title="Q.A.S.T. Engine", layout="centered")
 
 st.title("Q.A.S.T. Engine")
