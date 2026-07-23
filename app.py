@@ -1,10 +1,8 @@
 import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
-
 # Configuración de página amplia
 st.set_page_config(page_title="Q.A.S.T. Engine", layout="wide")
-
 # Estilo visual oscuro tipo Dashboard
 st.markdown("""
     <style>
@@ -12,7 +10,6 @@ st.markdown("""
     .stMetric {background-color: #1c2533; padding: 15px; border-radius: 10px;}
     </style>
 """, unsafe_allow_html=True)
-
 # Encabezado
 st.title("Q.A.S.T. | MOTOR DE CÁLCULO")
 
