@@ -1,4 +1,16 @@
 import streamlit as st
+# Esto fuerza el estilo oscuro para que se parezca a lo que tenías
+st.set_page_config(page_title="Calculadora Q.A.S.T.", layout="centered")
+
+# Puedes añadir CSS para cambiar colores si quieres
+st.markdown("""
+    <style>
+    .stApp {
+        background-color: #0e1117;
+        color: #fafafa;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 import numpy as np
 
 st.title("Calculadora Cosmológica Q.A.S.T.")
