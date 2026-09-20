@@ -14,7 +14,7 @@ if st.button("Mostrar datos curiosos"):
     st.balloons()
 
 st.title("Q.A.S.T. Engine")
-st.subheader("Modelo de Anclaje Cuántico — Invarianza del Observador")
+st.subheader("MotorQast — Invarianza del Observador")
 
 # H0 Base fijado por el modelo (Planck)
 H0_BASE = 67.4
