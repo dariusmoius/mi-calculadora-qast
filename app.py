@@ -85,9 +85,9 @@ h0 = H0_BASE + 2.3 * np.log10(1.0 + actividad)
 
 
 # --- INTERFAZ PRINCIPAL DE RESULTADOS ---
-st.markdown("### h📊 ")
+st.markdown("### Datos obtenidos de: ")
 # --- INTERFAZ PRINCIPAL DE RESULTADOS ---
-st.markdown("### 📊 Verificación de la Métrica de Anclaje Cuántico")
+st.markdown("### https://ned.ipac.caltech.edu/")
 
 st.success(
     f"🔒 **Cálculo Blindado con Éxito:** El motor dedujo internamente una **Velocidad Peculiar Corregida** de **{v_pec_corr:.2f} km/s**."
