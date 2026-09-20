@@ -25,7 +25,7 @@ st.sidebar.write("Selecciona cómo vas a copiar los datos desde la pantalla de l
 opcion_marcador = st.sidebar.radio(
     "Marco de referencia elegido:",
     ["Opción A: Usar datos de Helio", "Opción B: Usar datos de CMB"]
-)
+
 
 # Inicialización de variables de cálculo
 v_obs = 0.0
@@ -39,14 +39,14 @@ if opcion_marcador == "Opción A: Usar datos de Helio":
         value=179.0, 
         step=1.0,
         help="Introduce el valor exacto de la primera columna de velocidad en NED (ej. para M33 es -179 o 179). El sistema toma el módulo automáticamente."
-    )
+    
     distancia = st.sidebar.number_input(
         "Copiar de la columna 'Distancia media [Mpc]':", 
         value=0.869, 
         step=0.01, 
         format="%.3f",
         help="Introduce el valor de la distancia física independiente que aparece al final de la fila de distancias en NED."
-    )
+    
     
 else:
     st.sidebar.markdown("---")
