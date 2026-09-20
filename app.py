@@ -30,8 +30,8 @@ opcion_marcador = st.sidebar.radio(
 )
 
 # Inicialización de variables de cálculo
-v_obs = 0.0
-distancia = 0.0
+v_obs = 5000.0
+distancia = 01.0
 
 # CORRECCIÓN 2: Se eliminó un espacio en blanco accidental en el texto de comparación
 if opcion_marcador == "Usar datos de Helio":
