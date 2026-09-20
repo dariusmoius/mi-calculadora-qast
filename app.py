@@ -110,7 +110,7 @@ else:
     )
 
 st.success(
-    f"🔒 **Cálculo Blindado con Éxito:** El motor dedujo internamente una **Velocidad Peculiar Corregida** de **{v_pec_corr:.2f} km/s**."
+    f"🔒 **GRAFICO**."
 )
 
 # Despliegue de métricas principales unificadas
