@@ -80,7 +80,7 @@ st.success(
 )
 
 
-)
+
 
 # Despliegue de métricas principales
 col1, col2 = st.columns(2)
