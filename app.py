@@ -75,26 +75,35 @@ v_rot = st.sidebar.number_input(
     help="Velocidad de rotación del sistema del observador. Por defecto 240 km/s (Vía Láctea)."
 )
 
-# --- PROCESAMIENTO MATEMÁTICO INVIOLABLE ---
+# --- PROCESAMIENTO MATEMÁTICO INVIOLABLE CON FILTRO DE BURBUJA ---
 v_obs_abs = np.abs(v_obs)
 distancia_abs = np.abs(distancia)
 
-# Ecuación de corrección exacta: V_pec_corr = V_obs - (67.4 * d)
-v_pec_corr = np.abs(v_obs_abs - (H0_BASE * distancia_abs))
+# FILTRO DE SEGURIDAD INTERACTIVO (Límite empírico QAST: 50 Mpc)
+if distancia_abs > 50.0:
+    st.error(
+        f"🚨 **Objeto fuera de los límites de la Burbuja Local (d = {distancia_abs:.2f} Mpc):** "
+        f"El formalismo covariante QAST establece que el Tensor de Anclaje Cuántico opera en el universo cercano "
+        f"donde las fluctuaciones cinemáticas alteran la percepción espacial. A distancias macroscópicas superiores a 50 Mpc, "
+        f"el flujo cosmológico se vuelve homogéneo e isotrópico, por lo que la constante debe converger estrictamente "
+        f"al valor global de Planck (67.4 km/s/Mpc). Por favor, introduce un objeto del universo local (d ≤ 50 Mpc)."
+    )
+    # Forzamos los valores límite para proteger el gráfico y las métricas
+    actividad = 0.0
+    h0 = H0_BASE
 
-# Factor de Actividad Cinemática (A) y Ansatz Logarítmico QAST
-actividad = (v_pec_corr / v_rot) * 100.0
-h0 = H0_BASE + 2.3 * np.log10(1.0 + actividad)
+else:
+    # Ecuación de corrección exacta si cumple el criterio del universo cercano
+    v_pec_corr = np.abs(v_obs_abs - (H0_BASE * distancia_abs))
 
+    # Factor de Actividad Cinemática (A) y Ansatz Logarítmico QAST
+    actividad = (v_pec_corr / v_rot) * 100.0
+    h0 = H0_BASE + 2.3 * np.log10(1.0 + actividad)
 
-# --- INTERFAZ PRINCIPAL DE RESULTADOS ---
-st.markdown("### Datos obtenidos de: ")
-# --- INTERFAZ PRINCIPAL DE RESULTADOS ---
-st.markdown("### https://ned.ipac.caltech.edu/")
-
-st.success(
-    f"🔒 **Cálculo Blindado con Éxito:** El motor dedujo internamente una **Velocidad Peculiar Corregida** de **{v_pec_corr:.2f} km/s**."
-)
+    # Mensaje de éxito si pasa el filtro
+    st.success(
+        f"🔒 **Cálculo Blindado con Éxito:** El motor dedujo internamente una **Velocidad Peculiar Corregida** de **{v_pec_corr:.2f} km/s**."
+    )
 
 # NUEVO BLOQUE EXPLICATIVO DINÁMICO QUE CONFIRMA TU IDEA
 if opcion_marcador == "Usar datos de CMB":
