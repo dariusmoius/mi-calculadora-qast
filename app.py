@@ -7,7 +7,10 @@ st.set_page_config(page_title="Q.A.S.T. Engine", layout="centered")
 
 # Datos curiosos iniciales
 if st.button("Mostrar datos curiosos"):
-    st.info("La constante de Hubble fue nombrada por Edwin Hubble.")
+    st.info("Dato Práctico de la NASA (NED):** Las galaxias con un prefijo 'M' (como M33 o M31) "
+        "pertenecen al Catálogo Messier y están en nuestro vecindario cósmico inmediato. Al estar tan cerca, "
+        "su gravedad local domina sobre la expansión del tejido espacial, por lo que la base de datos NED suele "
+        "mostrar velocidades observadas (cz) con valores negativos. ¡Esto significa que se están acercando a nosotros!")
     st.balloons()
 
 st.title("Q.A.S.T. Engine")
@@ -110,7 +113,7 @@ else:
     )
 
 st.success(
-    f"🔒 **GRAFICO**."
+    f"🔒 **RESULTADOS**."
 )
 
 # Despliegue de métricas principales unificadas
