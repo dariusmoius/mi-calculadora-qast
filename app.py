@@ -31,7 +31,7 @@ opcion_marcador = st.sidebar.radio(
 v_obs = 0.0
 distancia = 0.0
 
-if opcion_marcador == "Opción A: Usar datos de Helio":
+if opcion_marcador == " Usar datos de Helio":
     st.sidebar.markdown("---")
     st.sidebar.subheader("Datos Heliocéntricos")
     v_obs = st.sidebar.number_input(
