@@ -10,8 +10,7 @@ st.title("Q.A.S.T. Engine")
 st.write("Escribe un número y mira el resultado al instante:")
 
 # Aquí está el truco: se calcula solo al escribir
-import streamlit as st
-import numpy as np
+
 
 st.title("MOTORQAST Engine")
 st.subheader("Modelo de Anclaje Cuántico — Invarianza del Observador")
@@ -84,7 +83,7 @@ v_pec_corr = np.abs(v_obs_abs - (H0_BASE * distancia_abs))
 
 # Factor de Actividad Cinemática (A) y Ansatz Logarítmico QAST
 A = (v_pec_corr / v_rot) * 100.0
-h0_aparente = H0_BASE + 2.3 * np.log10(1.0 + A)
+h0_aparente = H0_BASE + 2.3 * np.log10(1 + A)
 
 
 # --- INTERFAZ PRINCIPAL DE RESULTADOS ---
@@ -96,11 +95,7 @@ st.success(
     f"La **Velocidad Peculiar Corregida** deducida internamente es de **{v_pec_corr:.2f} km/s**."
 )
 
-# Bloque educativo para que el evaluador entienda la invarianza del modelo
-st.info(
-    "💡 **Nota de Rigor Científico:** Debido a la estructura matemática de tu modelo, "
-    "si ingresas el par correcto de Helio o el par correcto de CMB, la velocidad peculiar corregida "
-    "y el H₀ aparente convergerán de forma matemática exacta al mismo valor, eliminando el sesgo de perspectiva."
+
 )
 
 # Despliegue de métricas principales
