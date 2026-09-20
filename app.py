@@ -52,7 +52,7 @@ st.markdown("### 📥 Entrada de Parámetros")
 # El usuario ingresa directamente la velocidad peculiar ya corregida matemáticamente
 v_pec_corr_input = st.number_input(
     "Velocidad Peculiar Corregida (km/s):", 
-    value=0 
+    value=1.0,
     step=0.1,
     help="Ingresa el resultado absoluto de la ecuación: |V_obs - 67.4*d|. Asegúrate de estar dentro del rango local."
 )
