@@ -75,19 +75,19 @@ v_rot = st.sidebar.number_input(
     help="Velocidad de rotación del sistema del observador. Por defecto 240 km/s (Vía Láctea)."
 )
 
-# --- PROCESAMIENTO MATEMÁTICO INVIOLABLE CON FILTRO DE BURBUJA REAL ---
+# --- PROCESAMIENTO MATEMÁTICO INVIOLABLE CON FILTRO DE BURBUJA SH0ES (65 Mpc) ---
 v_obs_abs = np.abs(v_obs)
 distancia_abs = np.abs(distancia)
 
-# FILTRO DE SEGURIDAD AVANZADO: Límite de la burbuja local (z ≈ 0.011 o d ≈ 50 Mpc)
-# Si la velocidad supera los 3,300 km/s o la distancia los 50 Mpc, salimos de la región QAST
-if distancia_abs > 50.0 or v_obs_abs > 3300.0:
+# FILTRO DE SEGURIDAD CALIBRADO CON SH0ES: Límite de la escala local (d ≈ 65 Mpc o cz ≈ 4400 km/s)
+if distancia_abs > 65.0 or v_obs_abs > 4400.0:
     st.error(
-        f"🚨 **Objeto fuera de los límites de la Burbuja Local:** "
+        f"🚨 **Objeto fuera de los límites de la Burbuja Local de SH0ES:** "
         f"Has ingresado un objeto con cz = {v_obs_abs:.2f} km/s y d = {distancia_abs:.2f} Mpc. "
-        f"El formalismo QAST establece que a grandes escalas macroscópicas el flujo se vuelve homogéneo, "
-        f"por lo que el valor medido debe converger estrictamente al valor global de Planck (**67.4 km/s/Mpc**). "
-        f"Por favor, introduce datos de una galaxia del universo cercano (cz ≤ 3300 km/s y d ≤ 50 Mpc)."
+        f"El formalismo QAST establece que más allá del límite de la escalera de distancias local de Riess (65 Mpc), "
+        f"el flujo cosmológico se vuelve homogéneo e isotrópico. A escalas macroscópicas, el valor medido "
+        f"debe converger estrictamente al valor de fondo de Planck (**67.4 km/s/Mpc**). "
+        f"Por favor, introduce datos del universo cercano (cz ≤ 4400 km/s y d ≤ 65 Mpc)."
     )
     # Forzamos que los resultados del modelo tiendan exactamente al valor base global
     actividad = 0.0
@@ -101,7 +101,7 @@ else:
     actividad = (v_pec_corr / v_rot) * 100.0
     h0 = H0_BASE + 2.3 * np.log10(1.0 + actividad)
 
-    # Mensaje de éxito si los datos son físicamente coherentes con la burbuja local
+    # Mensaje de éxito si los datos son físicamente coherentes con la burbuja de SH0ES
     st.success(
         f"🔒 **Cálculo Blindado con Éxito:** El motor dedujo internamente una **Velocidad Peculiar Corregida** de **{v_pec_corr:.2f} km/s**."
     )
