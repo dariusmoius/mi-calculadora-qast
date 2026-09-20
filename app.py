@@ -24,7 +24,7 @@ st.sidebar.write("Selecciona cómo vas a copiar los datos desde la pantalla de l
 
 opcion_marcador = st.sidebar.radio(
     "Marco de referencia elegido:",
-    ["Opción A: Usar datos de Helio", "Opción B: Usar datos de CMB"]
+    ["Usar datos de Helio"]
 
 
 # Inicialización de variables de cálculo
@@ -48,22 +48,6 @@ if opcion_marcador == "Opción A: Usar datos de Helio":
         help="Introduce el valor de la distancia física independiente que aparece al final de la fila de distancias en NED."
     
     
-else:
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("Datos del Fondo Cósmico (CMB)")
-    v_obs = st.sidebar.number_input(
-        "Copiar de la columna 'cz (CMB) [km/s]':", 
-        value=460.0, 
-        step=1.0,
-        help="Introduce el valor corregido respecto al CMB (ej. para M33 es -460 o 460)."
-    )
-    distancia = st.sidebar.number_input(
-        "Copiar de 'Distancia de Hubble (CMB) [Mpc]':", 
-        value=0.869, 
-        step=0.01, 
-        format="%.3f",
-        help="Introduce la distancia ajustada al CMB. Si figura 'No disponible' en NED debido a la cercanía de la galaxia, utiliza la Distancia Media."
-    )
 
 # Velocidad de rotación característica (por defecto Vía Láctea)
 v_rot = st.sidebar.number_input(
