@@ -16,13 +16,13 @@ if st.button("Mostrar datos curiosos"):
     st.balloons()
 
 st.title("Q.A.S.T. Engine")
-st.subheader("Modelo de Anclaje Cuántico — Métrica del Observador")
+st.subheader("Modelo Herramienta Q.A.S.T. — Métrica del Observador")
 
 # --- BANNER DE CORTE CIENTÍFICO (LÍMITES DE RIESS / SH0ES) ---
 st.warning(
     "🌌 **Marco de Calibración Cosmológica (Límite de SH0ES):** "
     "Este motor opera dentro de la Burbuja Cinemática Local delimitada por el radio de la escalera de distancias de Adam Riess "
-    "(d ≤ 65 Mpc o cz ≤ 4400 km/s). Dentro de este rango, los movimientos del entorno inflan la métrica local. "
+    " Dentro de este rango, los movimientos del entorno inflan la métrica local. "
     "A escalas macroscópicas superiores (universo profundo), el flujo se vuelve homogéneo e isotrópico, disipando la actividad "
     "cinemática y provocando que el valor medido de H₀ regrese de forma estricta a la base global de Planck (**67.4 km/s/Mpc**)."
 )
@@ -52,7 +52,7 @@ st.markdown("### 📥 Entrada de Parámetros")
 # El usuario ingresa directamente la velocidad peculiar ya corregida matemáticamente
 v_pec_corr_input = st.number_input(
     "Velocidad Peculiar Corregida (km/s):", 
-    value=120.43, 
+    value=0 
     step=0.1,
     help="Ingresa el resultado absoluto de la ecuación: |V_obs - 67.4*d|. Asegúrate de estar dentro del rango local."
 )
