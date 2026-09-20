@@ -2,147 +2,97 @@ import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
 
-# 1. Configuración de página obligatoria como primera instrucción de Streamlit
+# 1. Configuración de página de Streamlit
 st.set_page_config(page_title="Q.A.S.T. Engine", layout="centered")
 
 # Datos curiosos iniciales
 if st.button("Mostrar datos curiosos"):
-    st.info("Dato Práctico de la NASA (NED):** Las galaxias con un prefijo 'M' (como M33 o M31) "
+    st.info(
+        "📊 **Dato Práctico de la NASA (NED):** Las galaxias con un prefijo 'M' (como M33 o M31) "
         "pertenecen al Catálogo Messier y están en nuestro vecindario cósmico inmediato. Al estar tan cerca, "
         "su gravedad local domina sobre la expansión del tejido espacial, por lo que la base de datos NED suele "
-        "mostrar velocidades observadas (cz) con valores negativos. ¡Esto significa que se están acercando a nosotros!")
+        "mostrar velocidades observadas (cz) con valores negativos. ¡Esto significa que se están acercando a nosotros!"
+    )
     st.balloons()
 
 st.title("Q.A.S.T. Engine")
-st.subheader("MotorQast — Invarianza del Observador")
+st.subheader("Modelo de Anclaje Cuántico — Métrica del Observador")
 
-# H0 Base fijado por el modelo (Planck)
-H0_BASE = 67.4
-
-# --- PANEL LATERAL: SELECCIÓN DEL MÉTODO DE INGRESO ---
-st.sidebar.header("📥 Entrada de Datos Crudos (NED)")
-st.sidebar.write("Selecciona cómo vas a copiar los datos desde la pantalla de la NASA:")
-
-# CORRECCIÓN 1: Se agregó la coma (,) que faltaba entre las opciones del radio button
-opcion_marcador = st.sidebar.radio(
-    "Marco de referencia elegido:",
-    ["Usar datos de Helio", "Usar datos de CMB"]
+# --- BANNER DE CORTE CIENTÍFICO (LÍMITES DE RIESS / SH0ES) ---
+st.warning(
+    "🌌 **Marco de Calibración Cosmológica (Límite de SH0ES):** "
+    "Este motor opera dentro de la Burbuja Cinemática Local delimitada por el radio de la escalera de distancias de Adam Riess "
+    "(d ≤ 65 Mpc o cz ≤ 4400 km/s). Dentro de este rango, los movimientos del entorno inflan la métrica local. "
+    "A escalas macroscópicas superiores (universo profundo), el flujo se vuelve homogéneo e isotrópico, disipando la actividad "
+    "cinemática y provocando que el valor medido de H₀ regrese de forma estricta a la base global de Planck (**67.4 km/s/Mpc**)."
 )
 
-# Inicialización de variables de cálculo
-v_obs = 5000.0
-distancia = 01.0
-
-# CORRECCIÓN 2: Se eliminó un espacio en blanco accidental en el texto de comparación
-if opcion_marcador == "Usar datos de Helio":
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("Datos Heliocéntricos")
-    v_obs = st.sidebar.number_input(
-        "Copiar de la columna 'cz (Helio) [km/s]':", 
-        value=55555
-        step=1.0,
-        help="Introduce el valor de la primera columna de velocidad en NED. El sistema toma el módulo automáticamente."
-    )
-    distancia = st.sidebar.number_input(
-        "Copiar de la columna 'Distancia media [Mpc]':", 
-        value=50000.0, 
-        step=0.01, 
-        format="%.3f",
-        help="Introduce la distancia física independiente al final de la fila de distancias en NED."
-    )
-else:
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("Datos del Fondo Cósmico (CMB)")
-    v_obs = st.sidebar.number_input(
-        "Copiar de la columna 'cz (CMB) [km/s]':", 
-        value=460.0, 
-        step=1.0,
-        help="Introduce el valor corregido respecto al CMB."
-    )
-    distancia = st.sidebar.number_input(
-        "Copiar de 'Distancia de Hubble (CMB) [Mpc]':", 
-        value=0.869, 
-        step=0.01, 
-        format="%.3f",
-        help="Introduce la distancia ajustada al CMB. Si no está disponible, usa la Distancia Media."
+# --- SECCIÓN DE INSTRUCCIONES PARA EL CÁLCULO ---
+with st.expander("📖 Guía de uso: Cómo calcular la Velocidad Peculiar Corregida"):
+    st.markdown(
+        """
+        Para evitar distorsiones por escalas de distancia en el universo profundo, debes ingresar el valor corregido. 
+        Sigue estos pasos con los datos de la base de datos **NASA/IPAC (NED)**:
+        
+        1. **Busca la galaxia** en [NED](https://caltech.edu).
+        2. **Identifica las variables crudas**:
+            * Extrae la velocidad observada (\(V_{obs}\)): Usa la columna `cz (Helio)` o `cz (CMB)` en km/s.
+            * Extrae la distancia (\(d\)): Usa la `Distancia media [Mpc]` (o la de CMB correspondiente).
+        3. **Aplica la ecuación de control antes de ingresar el número**:
+            \[\text{V}_{pec\_corr} = \vert{}V_{obs} - (67.4 \times d)\vert{}\]
+        4. *Ejemplo (Messier 065)*: 
+            * Con \(V_{obs} = 808.5 \text{ km/s}\) y \(d = 12.229 \text{ Mpc}\) 
+            * Cálculo: \(\vert{}808.5 - (67.4 \times 12.229)\vert{} = \mathbf{15.29 \text{ km/s}}\).
+        """
     )
 
-# Velocidad de rotación característica
-v_rot = st.sidebar.number_input(
+# --- ENTRADA DE DATOS SIMPLIFICADA (COMO ANTES) ---
+st.markdown("### 📥 Entrada de Parámetros")
+
+# El usuario ingresa directamente la velocidad peculiar ya corregida matemáticamente
+v_pec_corr_input = st.number_input(
+    "Velocidad Peculiar Corregida (km/s):", 
+    value=120.43, 
+    step=0.1,
+    help="Ingresa el resultado absoluto de la ecuación: |V_obs - 67.4*d|. Asegúrate de estar dentro del rango local."
+)
+
+v_rot = st.number_input(
     "Velocidad de Rotación Sistema V_rot (km/s):", 
     value=240.0, 
     step=10.0,
-    help="Velocidad de rotación del sistema del observador. Por defecto 240 km/s (Vía Láctea)."
+    help="Velocidad de rotación de la galaxia del observador. Por defecto se usan 240 km/s (Vía Láctea)."
 )
 
-# --- PROCESAMIENTO MATEMÁTICO INVIOLABLE CON FILTRO DE BURBUJA SH0ES (65 Mpc) ---
-v_obs_abs = np.abs(v_obs)
-distancia_abs = np.abs(distancia)
+# --- PROCESAMIENTO MATEMÁTICO CORE ORIGINAL ---
+H0_BASE = 67.4
+v_pec_corr_abs = np.abs(v_pec_corr_input)
 
-# FILTRO DE SEGURIDAD CALIBRADO CON SH0ES: Límite de la escala local (d ≈ 65 Mpc o cz ≈ 4400 km/s)
-if distancia_abs > 65.0 or v_obs_abs > 4400.0:
-    st.error(
-        f"🚨 **Objeto fuera de los límites de la Burbuja Local de SH0ES:** "
-        f"Has ingresado un objeto con cz = {v_obs_abs:.2f} km/s y d = {distancia_abs:.2f} Mpc. "
-        f"El formalismo QAST establece que más allá del límite de la escalera de distancias local de Riess (65 Mpc), "
-        f"el flujo cosmológico se vuelve homogéneo e isotrópico. A escalas macroscópicas, el valor medido "
-        f"debe converger estrictamente al valor de fondo de Planck (**67.4 km/s/Mpc**). "
-        f"Por favor, introduce datos del universo cercano (cz ≤ 4400 km/s y d ≤ 65 Mpc)."
-    )
-    # Forzamos que los resultados del modelo tiendan exactamente al valor base global
-    actividad = 0.0
-    h0 = H0_BASE
+# Factor de Actividad Cinemática (A) basado en tu fórmula matemática pura
+actividad = (v_pec_corr_abs / v_rot) * 100.0
 
-else:
-    # Ecuación de corrección exacta de tu paper para el universo cercano
-    v_pec_corr = np.abs(v_obs_abs - (H0_BASE * distancia_abs))
-
-    # Factor de Actividad Cinemática (A) y Ansatz Logarítmico QAST
-    actividad = (v_pec_corr / v_rot) * 100.0
-    h0 = H0_BASE + 2.3 * np.log10(1.0 + actividad)
-
-    # Mensaje de éxito si los datos son físicamente coherentes con la burbuja de SH0ES
-    st.success(
-        f"🔒 **Cálculo Blindado con Éxito:** El motor dedujo internamente una **Velocidad Peculiar Corregida** de **{v_pec_corr:.2f} km/s**."
-    )
+# Ansatz Logarítmico del Tensor de Anclaje Cuántico
+h0 = H0_BASE + 2.3 * np.log10(1.0 + actividad)
 
 
-# NUEVO BLOQUE EXPLICATIVO DINÁMICO QUE CONFIRMA TU IDEA
-if opcion_marcador == "Usar datos de CMB":
-    st.info(
-        "💡 **Confirmación del Modelo Q.A.S.T.:** Al pasar del marco Heliocéntrico al marco CMB, "
-        "la velocidad observada es más alta de manera neta. Al evaluar esta mayor velocidad manteniendo la misma distancia, "
-        "**la Actividad Cinemática (A) escala automáticamente por ley matemática, lo que conduce a un H₀ aparente más alto.** "
-        "Esto demuestra empíricamente la tesis central del proyecto: el valor medido de la expansión local está íntimamente "
-        "ligado al estado de movimiento del observador respecto al vacío cuántico."
-    )
-else:
-    st.info(
-        "💡 **Nota de Rigor Científico:** Este cálculo evalúa la galaxia desde el marco Heliocéntrico local. "
-        "Si cambias a la opción de datos CMB, observarás cómo un incremento en la velocidad observada genera de forma natural "
-        "un aumento en la Actividad Cinemática y, por ende, un H₀ aparente más elevado, validando el comportamiento logarítmico del modelo."
-    )
+# --- DESPLIEGUE DE MÉTRICAS ---
+st.markdown("### 📊 Resultados de la Métrica")
 
-st.success(
-    f"🔒 **RESULTADOS**."
-)
-
-# Despliegue de métricas principales unificadas
 col1, col2 = st.columns(2)
-col1.metric("H₀ Aparente Calculado", f"{h0:.2f}")
+col1.metric("H₀ Aparente Calculado", f"{h0:.2f} km/s/Mpc")
 col2.metric("Actividad Cinemática (A)", f"{actividad:.2f}%")
 
 
 # --- GRÁFICO DINÁMICO E INTERACTIVO ---
-st.markdown("### Posición de la Galaxia en la Curva Teórica QAST")
+st.markdown("### Posición del Objeto sobre la Curva Teórica QAST")
 
-# Generar la curva base del modelo hasta un 200% de actividad cinemática
+# Generar la curva base del modelo adaptada dinámicamente al punto introducido
 x_teorica = np.linspace(0, max(200, actividad + 20), 500)
 y_teorica = H0_BASE + (2.3 * np.log10(1.0 + x_teorica))
 
 fig = go.Figure()
 
-# Línea de la ecuación matemática del paper
+# Línea continua de la ecuación matemática del paper
 fig.add_trace(go.Scatter(
     x=x_teorica, 
     y=y_teorica, 
@@ -151,7 +101,7 @@ fig.add_trace(go.Scatter(
     line=dict(color='#00c9ff', width=3)
 ))
 
-# Punto exacto calculado dinámicamente para la galaxia actual
+# Punto exacto del objeto calculado
 fig.add_trace(go.Scatter(
     x=[actividad], 
     y=[h0], 
