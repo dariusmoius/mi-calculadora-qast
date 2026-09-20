@@ -39,13 +39,13 @@ if opcion_marcador == "Usar datos de Helio":
     st.sidebar.subheader("Datos Heliocéntricos")
     v_obs = st.sidebar.number_input(
         "Copiar de la columna 'cz (Helio) [km/s]':", 
-        value=0.0 
+        value=55555
         step=1.0,
         help="Introduce el valor de la primera columna de velocidad en NED. El sistema toma el módulo automáticamente."
     )
     distancia = st.sidebar.number_input(
         "Copiar de la columna 'Distancia media [Mpc]':", 
-        value=0.0, 
+        value=50000.0, 
         step=0.01, 
         format="%.3f",
         help="Introduce la distancia física independiente al final de la fila de distancias en NED."
