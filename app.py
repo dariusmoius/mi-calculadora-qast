@@ -23,9 +23,9 @@ st.sidebar.header("📥 Entrada de Datos Crudos (NED)")
 st.sidebar.write("Selecciona cómo vas a copiar los datos desde la pantalla de la NASA:")
 
 opcion_marcador = st.sidebar.radio(
-    "Marco de referencia elegido:",
+    "Marco de referencia elegido:"
     ["Usar datos de Helio"]
-
+)
 
 # Inicialización de variables de cálculo
 v_obs = 0.0
