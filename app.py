@@ -10,8 +10,7 @@ st.subheader("Métrica del Vacío Reactivo — Deducción Homogénea")
 
 st.info(
     "🌌 **Física del Backend (Modelo QAST Puro):** El motor opera bajo la acción logarítmica "
-    "de la actividad cinemática local. Curva de respuesta calibrada de forma estricta según "
-    "los primeros principios de tu modelo original."
+    "de la actividad cinemática local. Curva de respuesta calibrada de forma estricta  "
 )
 
 # --- TABLA DE PRESETS ---
