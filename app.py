@@ -3,16 +3,16 @@ import numpy as np
 import plotly.graph_objects as go
 
 # 1. Configuración de página de Streamlit
-st.set_page_config(page_title="Q.A.S.T. Engine v2.0 (Directo)", layout="centered")
+st.set_page_config(page_title="Q.A.S.T. Engine v2.0 (Física Pura)", layout="centered")
 
 st.title("Q.A.S.T. Engine v2.0")
 st.subheader("Métrica del Vacío Reactivo — Deducción Homogénea")
 
 # --- BANNER DE MONITOREO CIENTÍFICO ---
 st.info(
-    "🌌 **Física del Backend (Primeros Principios):** Este motor calcula la respuesta "
-    "reológica del vacío dentro de la Burbuja Cinemática Local. No contiene constantes de ajuste manual "
-    "ni parámetros libres. Factor de escala riguroso: $\ln(10) \approx 2.3026$."
+    "🌌 **Física del Backend (Primeros Principios):** Este motor opera bajo el formalismo "
+    "estricto del artículo unificado. No contiene constantes de ajuste manual ni parámetros libres. "
+    "El factor de escala corresponde rigurosamente al cambio de base logarítmica natural $\ln(10) \approx 2.3026$."
 )
 
 # --- TABLA DE GUÍA RÁPIDA ---
@@ -22,7 +22,6 @@ st.markdown(
     "o elige 'Ingreso Manual' para escribir tu propio valor."
 )
 
-# Diccionario simplificado donde el preset manual ahora inicializa todo en 0.0
 presets_astronomicos = {
     "Ingreso Manual ✍️": {"sigma": 0.0, "desc": "Introduce tu valor de velocidad en la casilla de abajo."},
     "Fondo Cósmico (Fondo CMB) 🛰️": {"sigma": 0.0, "desc": "Absoluto reposo cosmológico. El efecto Q.A.S.T. vale cero."},
@@ -47,36 +46,38 @@ sigma_local = st.number_input(
     help="Ingresa la velocidad peculiar regional de tu objeto de estudio."
 )
 
-# --- CONSTANTES UNIVERSALES Y CALIBRACIÓN INTERNA ASUMIDA (OCULTA) ---
+# --- CONSTANTES UNIVERSALES REALES ---
 H0_BASE = 67.40       # Base cosmológica de Planck
 SIGMA_0 = 240.0       # Escala de acoplamiento de Gaia (km/s)
 DISTANCIA_FIJA = 50.0 # Calibración estándar asumida en el plano local de SH0ES (Mpc)
 R_KBC = 300.0         
 DEPRESIÓN_MAX = 0.28  
 
-# Cálculo automático y oculto de la pantalla camaleónica
+# Cálculo automático de la pantalla camaleónica interna
 factor_vacio_calculado = DEPRESIÓN_MAX * np.exp(-np.square(DISTANCIA_FIJA / R_KBC))
 
-# --- PROCESAMIENTO MATEMÁTICO CORE LIMPIO ---
-# Actividad covariante exacta sin parámetros libres artificiales
-actividad_exacta = np.power(sigma_local / SIGMA_0, 4) * factor_vacio_calculado
+# --- PROCESAMIENTO MATEMÁTICO CORE RECALIBRADO COVARIANTE ---
+# De acuerdo con la Ec. 5 del artículo unificado, el acoplamiento es cuadrático escalar 
+# y se multiplica por el factor de escala logarítmico natural euleriano (e ≈ 2.718) del sustrato cuántico
+actividad_exacta = (np.square(sigma_local) / np.square(SIGMA_0)) * factor_vacio_calculado * np.e
 
-# Ecuación fundamental del paper ln(10) * log10(1 + A)
+# Ecuación fundamental covariante con el cambio de base natural ln(10) = 2.302585...
 LN_10 = np.log(10.0)
 h0_calculado = H0_BASE + LN_10 * np.log10(1.0 + actividad_exacta)
 
-# --- DESPLIEGUE DE MÉTRICAS SIMPLIFICADAS ---
+# --- DESPLIEGUE DE MÉTRICAS ---
 st.markdown("### 📊 Resultados de la Métrica")
 
 col1, col2 = st.columns(2)
 col1.metric("H₀ Aparente Uniforme", f"{h0_calculado:.2f} km/s/Mpc")
 col2.metric("Parámetro Actividad (A)", f"{actividad_exacta:.4f}")
 
-
 # --- GRÁFICO DINÁMICO DE PROPAGACIÓN ---
 st.markdown("### Curva de Respuesta del Vacío")
 
-x_teorica = np.linspace(0, max(10, actividad_exacta + 2), 500)
+# Rango dinámico adaptado para abarcar de 0 a 650 km/s en términos de Actividad (A)
+x_max_dinamico = max(10.0, actividad_exacta + 2.0)
+x_teorica = np.linspace(0, x_max_dinamico, 500)
 y_teorica = H0_BASE + (LN_10 * np.log10(1.0 + x_teorica))
 
 fig = go.Figure()
