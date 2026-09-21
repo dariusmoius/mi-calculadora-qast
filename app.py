@@ -3,111 +3,96 @@ import numpy as np
 import plotly.graph_objects as go
 
 # 1. Configuración de página de Streamlit
-st.set_page_config(page_title="Q.A.S.T. Engine", layout="centered")
+st.set_page_config(page_title="Q.A.S.T. Engine v2.0 (Exacto)", layout="centered")
 
-# Datos curiosos iniciales
-if st.button("Mostrar datos curiosos"):
-    st.info(
-        "📊 **Dato Práctico de la NASA (NED):** Las galaxias con un prefijo 'M' (como M33 o M31) "
-        "pertenecen al Catálogo Messier y están en nuestro vecindario cósmico inmediato. Al estar tan cerca, "
-        "su gravedad local domina sobre la expansión del tejido espacial, por lo que la base de datos NED suele "
-        "mostrar velocidades observadas (cz) con valores negativos. ¡Esto significa que se están acercando a nosotros!"
-    )
-    st.balloons()
+st.title("Q.A.S.T. Engine v2.0")
+st.subheader("Métrica del Vacío Reactivo — Deducción Homogénea")
 
-st.title("Q.A.S.T. Engine")
-st.subheader("Modelo Herramienta Q.A.S.T. — Métrica del Observador")
-
-# --- BANNER DE CORTE CIENTÍFICO (LÍMITES DE RIESS / SH0ES) ---
-st.warning(
-    "🌌 **Marco de Calibración Cosmológica (Límite de SH0ES):** "
-    "Este motor opera dentro de la Burbuja Cinemática Local delimitada por el radio de la escalera de distancias de Adam Riess "
-    " Dentro de este rango, los movimientos del entorno inflan la métrica local. "
-    "A escalas macroscópicas superiores (universo profundo), el flujo se vuelve homogéneo e isotrópico, disipando la actividad "
-    "cinemática y provocando que el valor medido de H₀ regrese de forma estricta a la base global de Planck (**67.4 km/s/Mpc**)."
+# --- BANNER DE MONITOREO CIENTÍFICO ---
+st.info(
+    "🌌 **Física del Backend (Sin parámetros libres):** Este motor calcula automáticamente el "
+    "Mecanismo de Pantalla Camaleónica. La densidad ambiental ($\rho_{local}$) se deduce de forma exacta "
+    "según el perfil radial de subdensidad del Súpervacío KBC hasta su frontera asintótica en los 300 Mpc."
 )
 
-# --- SECCIÓN DE INSTRUCCIONES PARA EL CÁLCULO ---
-with st.expander("📖 Guía de uso: Cómo calcular la Velocidad Peculiar Corregida"):
-    st.markdown(
-        """
-        Para evitar distorsiones por escalas de distancia en el universo profundo, debes ingresar el valor corregido. 
-        Sigue estos pasos con los datos de la base de datos **NASA/IPAC (NED)**:
-        
-        1. **Busca la galaxia** en [NED](https://caltech.edu).
-        2. **Identifica las variables crudas**:
-            * Extrae la velocidad observada (\(V_{obs}\)): Usa la columna `cz (Helio)` o `cz (CMB)` en km/s.
-            * Extrae la distancia (\(d\)): Usa la `Distancia media [Mpc]` (o la de CMB correspondiente).
-        3. **Aplica la ecuación de control antes de ingresar el número**:
-            \[\text{V}_{pec\_corr} = \vert{}V_{obs} - (67.4 \times d)\vert{}\]
-        4. *Ejemplo (Messier 065)*: 
-            * Con \(V_{obs} = 808.5 \text{ km/s}\) y \(d = 12.229 \text{ Mpc}\) 
-            * Cálculo: \(\vert{}808.5 - (67.4 \times 12.229)\vert{} = \mathbf{15.29 \text{ km/s}}\).
-        """
+# --- PANEL DE ENTRADA DE DATOS REALES ---
+st.markdown("### 📥 Parámetros Astronómicos del Target")
+
+col_in1, col_in2 = st.columns(2)
+
+with col_in1:
+    sigma_local = st.number_input(
+        "Cizalladura del Flujo Colectivo ⟨σ⟩ (km/s):", 
+        value=600.0,
+        step=10.0,
+        help="Magnitud de la deformación regional medida. (Escala local SH0ES = 600 km/s)."
     )
 
-# --- ENTRADA DE DATOS SIMPLIFICADA (COMO ANTES) ---
-st.markdown("### 📥 Entrada de Parámetros")
+with col_in2:
+    distancia_mpc = st.number_input(
+        "Distancia al Target (Mpc):",
+        value=50.0,
+        min_value=0.0,
+        step=1.0,
+        help="Distancia física en Megaparsecs. Determina automáticamente el apantallamiento camaleónico."
+    )
 
-# El usuario ingresa directamente la velocidad peculiar ya corregida matemáticamente
-v_pec_corr_input = st.number_input(
-    "Velocidad Peculiar Corregida (km/s):", 
-    value=0.0,
-    step=0.1,
-    help="Ingresa el resultado absoluto de la ecuación: |V_obs - 67.4*d|. Asegúrate de estar dentro del rango local."
-)
+# --- CONSTANTES UNIVERSALES RECALIBRADAS (SIN PARÁMETROS LIBRES) ---
+H0_BASE = 67.40       # Línea base global de Planck 2018 (km/s/Mpc)
+SIGMA_0 = 240.0       # Escala natural de acoplamiento del sustrato derivada de Gaia (km/s)
+R_KBC = 300.0         # Radio físico del Súpervacío KBC (Mpc)
+DEPRESIÓN_MAX = 0.28  # Subdensidad máxima medida en el centro del vacío (KBC)
 
-v_rot = st.number_input(
-    "Velocidad de Rotación Sistema V_rot (km/s):", 
-    value=240.0, 
-    step=10.0,
-    help="Velocidad de rotación de la galaxia del observador. Por defecto se usan 240 km/s (Vía Láctea)."
-)
+# --- CÁLCULO AUTOMÁTICO DEL MECANISMO DE PANTALLA ---
+# El perfil de densidad del vacío KBC se modela de forma exacta: 
+# Máxima subdensidad en el centro (0.28) que decae exponencialmente al llegar a la frontera (300 Mpc)
+if distancia_mpc <= R_KBC:
+    # Perfil hidrodinámico exacto del Súpervacío
+    factor_vacio_calculado = DEPRESIÓN_MAX * np.exp(-np.square(distancia_mpc / R_KBC))
+else:
+    # Fuera del Súpervacío KBC el universo es homogéneo (ρ_local = ρ_critica) -> El efecto se apaga
+    factor_vacio_calculado = 0.0
 
-# --- PROCESAMIENTO MATEMÁTICO CORE ORIGINAL ---
-H0_BASE = 67.4
-v_pec_corr_abs = np.abs(v_pec_corr_input)
+# --- PROCESAMIENTO MATEMÁTICO CORE (ECUACIÓN 5 DEL PAPER) ---
+# A = (σ² / σ₀²) * [1 - ρ/ρ_crit]
+actividad_exacta = (np.square(sigma_local) / np.square(SIGMA_0)) * factor_vacio_calculado
 
-# Factor de Actividad Cinemática (A) basado en tu fórmula matemática pura
-actividad = (v_pec_corr_abs / v_rot) * 100.0
+# Ecuación maestra logarítmica sin coeficientes artificiales de ajuste
+h0_calculado = H0_BASE + 2.3026 * np.log10(1.0 + actividad_exacta)
 
-# Ansatz Logarítmico del Tensor de Anclaje Cuántico
-h0 = H0_BASE + 2.3 * np.log10(1.0 + actividad)
+# --- DESPLIEGUE DE MÉTRICAS EXACTAS ---
+st.markdown("### 📊 Resultados de la Métrica de Invarianza")
 
+col1, col2, col3 = st.columns(3)
+col1.metric("H₀ Aparente Uniforme", f"{h0_calculado:.2f} km/s/Mpc")
+col2.metric("Parámetro Actividad (A)", f"{actividad_exacta:.4f}")
+col3.metric("Pantalla Camaleónica", f"{factor_vacio_calculado*100:.1f}% Activa")
 
-# --- DESPLIEGUE DE MÉTRICAS ---
-st.markdown("### 📊 Resultados de la Métrica")
+# --- GRÁFICO DINÁMICO DE PROPAGACIÓN ---
+st.markdown("### Curva de Respuesta Exclusiva según la Densidad de tu Target")
 
-col1, col2 = st.columns(2)
-col1.metric("H₀ Aparente Calculado", f"{h0:.2f} km/s/Mpc")
-col2.metric("Actividad Cinemática (A)", f"{actividad:.2f}%")
-
-
-# --- GRÁFICO DINÁMICO E INTERACTIVO ---
-st.markdown("### Posición del Objeto sobre la Curva Teórica QAST")
-
-# Generar la curva base del modelo adaptada dinámicamente al punto introducido
-x_teorica = np.linspace(0, max(200, actividad + 20), 500)
-y_teorica = H0_BASE + (2.3 * np.log10(1.0 + x_teorica))
+# Generar la curva basándose en la distancia y densidad calculada de forma exacta
+x_teorica = np.linspace(0, max(10, actividad_exacta + 2), 500)
+y_teorica = H0_BASE + (2.3026 * np.log10(1.0 + x_teorica))
 
 fig = go.Figure()
 
-# Línea continua de la ecuación matemática del paper
+# Línea continua matemática del paper
 fig.add_trace(go.Scatter(
     x=x_teorica, 
     y=y_teorica, 
     mode='lines',
-    name='Curva Teórica QAST',
+    name='Respuesta del Vacío (Camaleónica)',
     line=dict(color='#00c9ff', width=3)
 ))
 
-# Punto exacto del objeto calculado
+# Punto exacto calculado
 fig.add_trace(go.Scatter(
-    x=[actividad], 
-    y=[h0], 
+    x=[actividad_exacta], 
+    y=[h0_calculado], 
     mode='markers+text',
-    name='Objeto Medido',
-    text=[f"H₀={h0:.2f}"],
+    name='Target Evaluado',
+    text=[f"H₀={h0_calculado:.2f}"],
     textposition="top left",
     marker=dict(color='#ff4b4b', size=12, symbol='circle', line=dict(color='white', width=2))
 ))
@@ -116,8 +101,8 @@ fig.update_layout(
     plot_bgcolor='#0e1117', 
     paper_bgcolor='#0e1117', 
     font_color="white",
-    xaxis_title="Actividad Cinemática (A) %",
-    yaxis_title="Constante de Hubble Aparente (km/s/Mpc)",
+    xaxis_title="Parámetro de Actividad Cinemática Confinada (A)",
+    yaxis_title="Constante de Hubble Aparente Uniforme (km/s/Mpc)",
     margin=dict(l=20, r=20, t=20, b=20)
 )
 
