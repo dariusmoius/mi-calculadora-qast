@@ -2,16 +2,16 @@ import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
 
-# 1. Configuración de la aplicación
+# 1. Configuración de página de Streamlit
 st.set_page_config(page_title="Q.A.S.T. Engine v2.0", layout="centered")
 
 st.title("Q.A.S.T. Engine v2.0")
 st.subheader("Métrica del Vacío Reactivo — Deducción Homogénea")
 
 st.info(
-    "🌌 **Física del Backend (Primeros Principios):** Corrección estricta de la escala. "
-    "El motor opera bajo la acción tensorial covariante simplificada en el plano local, "
-    "garantizando invarianza y mapeo óptico directo."
+    "🌌 **Física del Backend (Modelo QAST Puro):** El motor opera bajo la acción logarítmica "
+    "de la actividad cinemática local. Curva de respuesta calibrada de forma estricta según "
+    "los primeros principios de tu modelo original."
 )
 
 # --- TABLA DE PRESETS ---
@@ -28,7 +28,7 @@ presets_astronomicos = {
 seleccion = st.selectbox("🎯 Seleccionar un entorno de calibración:", list(presets_astronomicos.keys()))
 st.caption(f"ℹ️ *{presets_astronomicos[seleccion]['desc']}*")
 
-# --- PANEL DE ENTRADA (INICIA EN 0.0) ---
+# --- PANEL DE ENTRADA (INICIA EN 0.0 POR DEFECTO) ---
 st.markdown("### 📥 Parámetro Astronómico")
 
 valor_sigma_base = presets_astronomicos[seleccion]["sigma"]
@@ -40,32 +40,31 @@ sigma_local = st.number_input(
     key="sigma_input"
 )
 
-# --- CONSTANTES UNIVERSALES ---
-H0_BASE = 67.40       # Base global de Planck
-SIGMA_0 = 240.0       # Escala de acoplamiento de Gaia (km/s)
+# --- CONSTANTES UNIVERSALES ORIGINALES DEL PAPER ---
+H0_BASE = 67.40       # Base cosmológica global de Planck
+V_ROT_BASE = 240.0    # Escala de rotación de la Vía Láctea (km/s)
 
-# --- PROCESAMIENTO MATEMÁTICO CORE RECTIFICADO ---
-# De acuerdo al paper formal, la Actividad (A) es la deformación adimensional cuadrática pura
-actividad_exacta = np.square(sigma_local / SIGMA_0)
+# --- PROCESAMIENTO MATEMÁTICO CORE EXACTO ---
+# Actividad en porcentaje, tal y como dictaminaba el paper original de Moio
+actividad_exacta = (sigma_local / V_ROT_BASE) * 100.0
 
-# Ecuación de calibración de amplitud libre (ln10 * constante de acoplamiento local = 2.302585 * 1.4427)
-# Esto estira la curva de forma exacta para cumplir los rangos cosmológicos
-MULTIPLICO_ESCALA = 2.302585 * 1.4427
-h0_calculado = H0_BASE + MULTIPLICO_ESCALA * np.log(1.0 + actividad_exacta)
+# Ecuación maestra logarítmica original en base 10 sin alteraciones escalares
+h0_calculado = H0_BASE + 2.302585 * np.log10(1.0 + actividad_exacta)
 
 # --- DESPLIEGUE DE MÉTRICAS ---
 st.markdown("### 📊 Resultados de la Métrica")
 
 col1, col2 = st.columns(2)
 col1.metric("H₀ Aparente Uniforme", f"{h0_calculado:.2f} km/s/Mpc")
-col2.metric("Parámetro Actividad (A)", f"{actividad_exacta:.4f}")
+col2.metric("Parámetro Actividad (A)", f"{actividad_exacta:.2f}%")
 
 # --- GRÁFICO DINÁMICO DE PROPAGACIÓN ---
 st.markdown("### Curva de Respuesta del Vacío")
 
-x_max_dinamico = max(10.0, actividad_exacta + 2.0)
-x_teorica = np.linspace(0, x_max_dinamico, 500)
-y_teorica = H0_BASE + (MULTIPLICO_ESCALA * np.log(1.0 + x_teorica))
+# Rango dinámico del gráfico ajustado para que la curva luzca fluida y estética
+x_max_grafico = max(300.0, actividad_exacta + 50.0)
+x_teorica = np.linspace(0, x_max_grafico, 500)
+y_teorica = H0_BASE + 2.302585 * np.log10(1.0 + x_teorica)
 
 fig = go.Figure()
 
@@ -91,7 +90,7 @@ fig.update_layout(
     plot_bgcolor='#0e1117', 
     paper_bgcolor='#0e1117', 
     font_color="white",
-    xaxis_title="Parámetro de Actividad (A)",
+    xaxis_title="Actividad Cinemática (A) %",
     yaxis_title="Constante de Hubble Aparente Uniforme (km/s/Mpc)",
     margin=dict(l=20, r=20, t=20, b=20)
 )
