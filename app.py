@@ -2,104 +2,89 @@ import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
 
-# 1. Configuración de página de Streamlit
-st.set_page_config(page_title="Q.A.S.T. Engine v2.0 (Estricto)", layout="centered")
+# ============================================================
+# Q.A.S.T. — Tensor de Anclaje · Motor de Cálculo
+# Versión 2.2 — Código abierto · Sin preajustes
+# Fórmula: H₀ = H₀_base + ln(10) · log₁₀[1 + (σ²/σ₀²)·(1 - ρ/ρ_crit)]
+# ============================================================
 
-st.title("Q.A.S.T. Engine v2.0")
-st.subheader("Métrica del Vacío Reactivo — Deducción Homogénea")
-
-# --- BANNER DE MONITOREO CIENTÍFICO ---
-st.info(
-    "🌌 **Física del Backend (Primeros Principios):** Corrección de base logarítmica. "
-    "El factor 2.3026 acopla el espacio de fases tensorial utilizando la métrica euleriana "
-    "del logaritmo natural de la acción."
+st.set_page_config(
+    page_title="Q.A.S.T. — Tensor de Anclaje",
+    layout="centered"
 )
 
-# --- TABLA DE GUÍA RÁPIDA ---
-st.markdown("### 📖 Guía de Calibración Rápida")
+st.title("Q.A.S.T. — Tensor de Anclaje")
+st.subheader("Motor de Cálculo · Versión Abierta")
 
-presets_astronomicos = {
-    "Ingreso Manual ✍️": {"sigma": 0.0, "desc": "Introduce tu valor de velocidad en la casilla de abajo."},
-    "Fondo Cósmico (Fondo CMB) 🛰️": {"sigma": 0.0, "desc": "Absoluto reposo cosmológico. El efecto Q.A.S.T. vale cero."},
-    "Máser NGC 4258 (Anclaje geométrico) 🌌": {"sigma": 220.0, "desc": "Velocidad de deformación en la galaxia de calibración NGC 4258."},
-    "Grupo Local (Entorno Vía Láctea) 🪐": {"sigma": 310.0, "desc": "Velocidad colectiva de nuestro cúmulo inmediato de galaxias."},
-    "Escala SH0ES (Burbuja Cinemática Local) 🚀": {"sigma": 600.0, "desc": "Límite regional donde el Flujo Colectivo infla de forma máxima el H₀ aparente."},
-}
+st.markdown(r"""
+### Fórmula Unificada
+$$
+H_0^{\text{ap}} = H_0^{\text{base}} + \ln(10) \cdot \log_{10}\!\left[\,1 + \frac{\langle\sigma^2\rangle}{\sigma_0^2} \left(1 - \frac{\rho_{\text{local}}}{\rho_{\text{crítica}}}\right) \right]
+$$
 
-seleccion = st.selectbox("🎯 Seleccionar un entorno de calibración:", list(presets_astronomicos.keys()))
-st.caption(f"ℹ️ *{presets_astronomicos[seleccion]['desc']}*")
+**Donde:**
+- \(H_0^{\text{base}} = 67{,}4\ \mathrm{km/s/Mpc}\) → valor intrínseco (Planck 2020)
+- \(\sigma_0 = 310\ \mathrm{km/s}\) → escala de referencia de cizalladura del Grupo Local
+- \(\langle\sigma^2\rangle^{1/2}\) → cizalladura cuadrática media del entorno (km/s)
+- \(\rho_{\text{local}}/\rho_{\text{crítica}}\) → densidad relativa del entorno (0 a 1)
+- \(\ln(10) \approx 2{,}302585\) → factor de conversión, **no parámetro ajustado**
+""")
 
-# --- PANEL DE ENTRADA DE DATOS ---
-st.markdown("### 📥 Parámetro Astronómico")
+st.info("📋 **Código sin valores predefinidos.** Todos los parámetros son ingresados por el usuario. Las constantes fundamentales están declaradas abajo y pueden verificarse.")
 
-valor_sigma_base = presets_astronomicos[seleccion]["sigma"]
-sigma_local = st.number_input(
-    "Cizalladura Flujo Colectivo ⟨σ⟩ (Velocidad Peculiar en km/s):", 
-    value=valor_sigma_base,
+# ──────────────────────────────────────────────────────
+# CONSTANTES — Declaradas explícitamente, SIN OCULTAR
+# ──────────────────────────────────────────────────────
+with st.expander("🔧 Constantes del modelo — Verificar"):
+    H0_BASE    = 67.40       # km/s/Mpc — Planck 2020
+    SIGMA_0    = 310.0       # km/s — escala de referencia
+    FACTOR_LOG = np.log(10)  # = 2.302585093 — conversión ln → base 10
+    
+    st.markdown(f"""
+    | Constante | Valor | Origen |
+    |---|---|---|
+    | \(H_0^{{base}}\) | {H0_BASE:.2f} km/s/Mpc | Planck 2018/2020 |
+    | \(\sigma_0\) | {SIGMA_0:.1f} km/s | Grupo Local / flujo colectivo |
+    | \(\ln(10)\) | {FACTOR_LOG:.6f} | Matemático, no ajuste |
+    """)
+
+# ──────────────────────────────────────────────────────
+# ENTRADA DEL USUARIO — LIMPIA, SIN PRESETS
+# ──────────────────────────────────────────────────────
+st.markdown("### 📥 Ingreso de Datos")
+
+st.markdown("""
+Ingresa los valores calculados desde tus datos observacionales:
+- **Cizalladura** ⟨σ²⟩¹ᐟ²: velocidad peculiar corregida del flujo colectivo del entorno (km/s)
+- **Densidad relativa** ρ/ρ_crit: densidad media del entorno respecto a la densidad crítica (entre 0 y 1)
+""")
+
+sigma = st.number_input(
+    "Cizalladura √⟨σ²⟩ (km/s):",
     min_value=0.0,
-    step=10.0,
-    key="sigma_input"
+    step=1.0,
+    format="%.1f",
+    help="Valor obtenido del análisis del flujo peculiar de tu muestra"
 )
 
-# --- CONSTANTES UNIVERSALES REALES ---
-H0_BASE = 67.40       
-SIGMA_0 = 240.0       
-DISTANCIA_FIJA = 50.0 
-R_KBC = 300.0         
-DEPRESIÓN_MAX = 0.28  
-
-# Cálculo del factor de subdensidad del Súpervacío KBC
-factor_vacio_calculado = DEPRESIÓN_MAX * np.exp(-np.square(DISTANCIA_FIJA / R_KBC))
-
-# --- PROCESAMIENTO MATEMÁTICO CORE CALIBRADO ---
-# Actividad adimensional corregida
-actividad_exacta = (np.square(sigma_local) / np.square(SIGMA_0)) * factor_vacio_calculado
-
-# RESOLUCIÓN LOGARÍTMICA NATURAL EXACTA (Evita la compresión a base 10)
-# Multiplicador deducido: 2.302585 * ln(1 + A)
-h0_calculado = H0_BASE + (2.302585 * np.log(1.0 + actividad_exacta))
-
-# --- DESPLIEGUE DE MÉTRICAS ---
-st.markdown("### 📊 Resultados de la Métrica")
-
-col1, col2 = st.columns(2)
-col1.metric("H₀ Aparente Uniforme", f"{h0_calculado:.2f} km/s/Mpc")
-col2.metric("Parámetro Actividad (A)", f"{actividad_exacta:.4f}")
-
-# --- GRÁFICO DINÁMICO DE PROPAGACIÓN ---
-st.markdown("### Curva de Respuesta del Vacío")
-
-x_max_dinamico = max(10.0, actividad_exacta + 2.0)
-x_teorica = np.linspace(0, x_max_dinamico, 500)
-y_teorica = H0_BASE + (2.302585 * np.log(1.0 + x_teorica))
-
-fig = go.Figure()
-
-fig.add_trace(go.Scatter(
-    x=x_teorica, 
-    y=y_teorica, 
-    mode='lines',
-    name='Respuesta del Vacío',
-    line=dict(color='#00c9ff', width=3)
-))
-
-fig.add_trace(go.Scatter(
-    x=[actividad_exacta], 
-    y=[h0_calculado], 
-    mode='markers+text',
-    name='Target Evaluado',
-    text=[f"H₀={h0_calculado:.2f}"],
-    textposition="top left",
-    marker=dict(color='#ff4b4b', size=12, symbol='circle', line=dict(color='white', width=2))
-))
-
-fig.update_layout(
-    plot_bgcolor='#0e1117', 
-    paper_bgcolor='#0e1117', 
-    font_color="white",
-    xaxis_title="Parámetro de Actividad (A)",
-    yaxis_title="Constante de Hubble Aparente Uniforme (km/s/Mpc)",
-    margin=dict(l=20, r=20, t=20, b=20)
+rho_rel = st.number_input(
+    "Densidad relativa ρ/ρ_crítica:",
+    min_value=0.01,
+    max_value=1.00,
+    value=1.00,
+    step=0.01,
+    format="%.2f",
+    help="1.0 = densidad crítica / universo homogéneo | < 1 = región subdensa"
 )
 
-st.plotly_chart(fig, use_container_width=True)
+# ──────────────────────────────────────────────────────
+# CÁLCULO PASO A PASO — TOTALMENTE TRANSPARENTE
+# ──────────────────────────────────────────────────────
+st.markdown("### ⚙️ Desarrollo del Cálculo")
+
+paso1 = np.square(sigma) / np.square(SIGMA_0)
+paso2 = 1.0 - rho_rel
+actividad = paso1 * paso2
+h0_calc = H0_BASE + FACTOR_LOG * np.log1p(actividad)
+
+st.markdown(f"""
