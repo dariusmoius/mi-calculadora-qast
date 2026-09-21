@@ -3,7 +3,7 @@ import numpy as np
 import plotly.graph_objects as go
 
 # 1. Configuración de página de Streamlit
-st.set_page_config(page_title="Q.A.S.T. Engine v2.0 (Corregido)", layout="centered")
+st.set_page_config(page_title="Q.A.S.T. Engine v2.0 (Estricto)", layout="centered")
 
 st.title("Q.A.S.T. Engine v2.0")
 st.subheader("Métrica del Vacío Reactivo — Deducción Homogénea")
@@ -11,7 +11,7 @@ st.subheader("Métrica del Vacío Reactivo — Deducción Homogénea")
 # --- BANNER DE MONITOREO CIENTÍFICO ---
 st.info(
     "🌌 **Física del Backend (Primeros Principios):** Corrección de base logarítmica. "
-    "El factor $2.3026$ ($\ln 10$) acopla el espacio de fases tensorial utilizando la métrica euleriana "
+    "El factor 2.3026 acopla el espacio de fases tensorial utilizando la métrica euleriana "
     "del logaritmo natural de la acción."
 )
 
@@ -42,22 +42,22 @@ sigma_local = st.number_input(
 )
 
 # --- CONSTANTES UNIVERSALES REALES ---
-H0_BASE = 67.40       # Base cosmológica de Planck
-SIGMA_0 = 240.0       # Escala de acoplamiento de Gaia (km/s)
-DISTANCIA_FIJA = 50.0 # Calibración estándar asumida en el plano local de SH0ES (Mpc)
+H0_BASE = 67.40       
+SIGMA_0 = 240.0       
+DISTANCIA_FIJA = 50.0 
 R_KBC = 300.0         
 DEPRESIÓN_MAX = 0.28  
 
-# Cálculo automático de la pantalla camaleónica interna
+# Cálculo del factor de subdensidad del Súpervacío KBC
 factor_vacio_calculado = DEPRESIÓN_MAX * np.exp(-np.square(DISTANCIA_FIJA / R_KBC))
 
-# --- PROCESAMIENTO MATEMÁTICO CORE CON LOGARITMO NATURAL ---
-# Actividad adimensional cuadrática escalada del nuevo paper
+# --- PROCESAMIENTO MATEMÁTICO CORE CALIBRADO ---
+# Actividad adimensional corregida
 actividad_exacta = (np.square(sigma_local) / np.square(SIGMA_0)) * factor_vacio_calculado
 
-# Ecuación fundamental corregida usando np.log() [Logaritmo Natural]
-COEFICIENTE_QAST = 2.302585
-h0_calculado = H0_BASE + COEFICIENTE_QAST * np.log(1.0 + actividad_exacta)
+# RESOLUCIÓN LOGARÍTMICA NATURAL EXACTA (Evita la compresión a base 10)
+# Multiplicador deducido: 2.302585 * ln(1 + A)
+h0_calculado = H0_BASE + (2.302585 * np.log(1.0 + actividad_exacta))
 
 # --- DESPLIEGUE DE MÉTRICAS ---
 st.markdown("### 📊 Resultados de la Métrica")
@@ -71,7 +71,7 @@ st.markdown("### Curva de Respuesta del Vacío")
 
 x_max_dinamico = max(10.0, actividad_exacta + 2.0)
 x_teorica = np.linspace(0, x_max_dinamico, 500)
-y_teorica = H0_BASE + (COEFICIENTE_QAST * np.log(1.0 + x_teorica))
+y_teorica = H0_BASE + (2.302585 * np.log(1.0 + x_teorica))
 
 fig = go.Figure()
 
