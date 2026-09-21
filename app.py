@@ -87,4 +87,4 @@ paso2 = 1.0 - rho_rel
 actividad = paso1 * paso2
 h0_calc = H0_BASE + FACTOR_LOG * np.log1p(actividad)
 
-st.markdown(f"""
+st.markdown(f""")
