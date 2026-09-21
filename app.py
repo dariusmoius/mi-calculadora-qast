@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 st.set_page_config(page_title="Q.A.S.T. Engine v2.0", layout="centered")
 
 st.title("Q.A.S.T. Engine v2.0")
-st.subheader("Métrica del Vacío Reactivo — Deducción Homogénea")
+st.subheader()
 
 st.info(
     "🌌 **Física del Backend (Modelo QAST Puro):** El motor opera bajo la acción logarítmica "
