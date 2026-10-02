@@ -1,28 +1,26 @@
 import streamlit as st
-import numpy as np
-import plotly.graph_objects as go
+# Esto fuerza el estilo oscuro para que se parezca a lo que tenías
+st.set_page_config(page_title="Calculadora Q.A.S.T.", layout="centered")
 
-# Configuración de página amplia
-st.set_page_config(page_title="Q.A.S.T. Engine", layout="wide")
-
-# Estilo visual oscuro tipo Dashboard
+# Puedes añadir CSS para cambiar colores si quieres
 st.markdown("""
     <style>
-    .main {background-color: #0e1117;}
-    .stMetric {background-color: #1c2533; padding: 15px; border-radius: 10px;}
+    .stApp {
+        background-color: #0e1117;
+        color: #fafafa;
+    }
     </style>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
+import numpy as np
 
-# Encabezado
-st.title("Q.A.S.T. | MOTOR DE CÁLCULO")
+st.title("Calculadora Cosmológica Q.A.S.T.")
 
-# --- FILA SUPERIOR: MÉTRICAS ---
-col1, col2, col3, col4 = st.columns(4)
-v_input = 0.0 # Valor por defecto
-col1.metric("V_PECULIAR", "0.00 km/s")
-col2.metric("ACTIVIDAD (A)", "0.00%")
-col3.metric("H0 APARENTE", "67.40")
-col4.metric("RESIDUO", "0.00")
+v = st.number_input("Velocidad Peculiar (km/s)", value=0.0)
+r = st.number_input("Rotación Observador", value=240.0)
 
-# --- FILA INFERIOR: ENTRADA Y GRÁFICO ---
-left_col, right_col = st.columns([1, 3])
+if st.button("Calcular"):
+    actividad = (abs(v) / r) * 100
+    h0 = 67.4 + (2.3 * np.log10(1 + actividad))
+    
+    st.metric("H0 Aparente", f"{h0:.2f} km/s/Mpc")
+    st.write(f"Nivel de Actividad: {actividad:.2f}%")
