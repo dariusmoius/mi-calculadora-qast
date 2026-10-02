@@ -97,7 +97,7 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True)
-lefy-col,right-col=st.columns(2)
+left_col,right_col=st.columns(2)
 with left_col:
     st.subheader("Modo de Entrada")
     if st.button("V_peculiar"): pass
