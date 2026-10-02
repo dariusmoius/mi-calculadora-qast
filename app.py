@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 ROTACION_OBSERVADOR = 240 # Tensor de Anclaje fijo (Métrica Moio)
 H_BASE = 67.4 # Sustrato Activo (Planck)
 C_LOG = 2.3 # Módulo de Elasticidad de Moio
-def ejecutar_sistema_fighter():
+
 print("--- MOTOR DE CÁLCULO Q.A.S.T. (VERSION FIGHTER) ---")
 print(f"Soberanía Técnica: H_base {H_BASE} | Anclaje Rotación
 {ROTACION_OBSERVADOR}")
