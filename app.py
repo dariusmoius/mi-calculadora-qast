@@ -1,76 +1,116 @@
 import streamlit as st
-# Esto fuerza el estilo oscuro para que se parezca a lo que tenías
-st.set_page_config(page_title="Calculadora Q.A.S.T.", layout="centered")
-
 import numpy as np
 import plotly.graph_objects as go
-# --- CONSTANTES PROYECTO Q.A.S.T. (VALORES FIJOS) ---
-ROTACION_OBSERVADOR = 240 # Tensor de Anclaje fijo (Métrica Moio)
-H_BASE = 67.4 # Sustrato Activo (Planck)
-C_LOG = 2.3 # Módulo de Elasticidad de Moio
 
-print("--- MOTOR DE CÁLCULO Q.A.S.T. (VERSION FIGHTER) ---")
-print(f"Soberanía Técnica: H_base {H_BASE} | Anclaje Rotación
-{ROTACION_OBSERVADOR}")
-while True:
-try:
-print("\nMODO DE OBTENCIÓN:")
-print("1. Cargar V_peculiar Corregida")
-print("2. Calcular V_peculiar (Protocolo m, M, V_cmb)")
-print("0. Salir")
-opcion = input("Selección: ")
-if opcion == "0":
-break
-if opcion == "1":
-v_input = float(input("V_peculiar (km/s): "))
-elif opcion == "2":
-m = float(input("m (Magnitud Aparente): "))
-M = float(input("M (Magnitud Absoluta): "))
-v_cmb = float(input("V_cmb (Velocidad medida): "))
-distancia = 10**((m - M + 5) / 5) / 1e6
-v_input = v_cmb - (H_BASE * distancia)
-print(f"-> Distancia calculada: {distancia:.4f} Mpc")
-else:
-continue
-# --- CÁLCULO DE ACTIVIDAD Y H0 APARENTE ---
-v_abs = abs(v_input)
-# Actividad mecánica del sistema local
-actividad = (v_abs / ROTACION_OBSERVADOR) * 100
-# H0 Aparente con el residuo del anclaje (Fórmula Moio)
-h0_apa = H_BASE + (C_LOG * np.log10(1 + actividad))
-residuo = h0_apa - H_BASE
-print("\n" + "!"*50)
-print(f"ANCLAJE DE ROTACIÓN: {ROTACION_OBSERVADOR}")
-print(f"ACTIVIDAD (A): {actividad:.4f}%")
-print(f"H0 APARENTE: {h0_apa:.4f} km/s/Mpc")
-print(f"RESIDUO CALCULADO: {residuo:.4f} km/s/Mpc")
-print("!"*50)
-# --- VISUALIZACIÓN DE LA MÉTRICA ---
-v_rango = np.linspace(0, 1500, 300)
-A_rango = (v_rango / ROTACION_OBSERVADOR) * 100
-H_rango = H_BASE + (C_LOG * np.log10(1 + A_rango))
+# 1. Configuración de página de Streamlit
+st.set_page_config(page_title="Q.A.S.T. Engine v2.0", layout="centered")
+
+st.title("Q.A.S.T. Engine v2.0")
+st.subheader("MOTOR-QAST")
+
+st.info(
+    "🌌 **Física del Backend (Modelo QAST Puro):** El motor opera bajo la acción logarítmica "
+    "de la actividad cinemática local. Curva de respuesta calibrada de forma estricta  "
+)
+
+# --- TABLA DE PRESETS ---
+st.markdown("### 📖 Guía de Calibración Rápida")
+
+presets_astronomicos = {
+    "Ingreso Manual ✍️": {"sigma": 0.0, "desc": "Introduce tu valor de velocidad en la casilla de abajo."},
+    "Fondo Cósmico (Fondo CMB) 🛰️": {"sigma": 0.0, "desc": "Absoluto reposo cosmológico. El efecto Q.A.S.T. vale cero."},
+    "Máser NGC 4258 (Anclaje geométrico) 🌌": {"sigma": 220.0, "desc": "Velocidad de deformación en la galaxia de calibración NGC 4258."},
+    "Grupo Local (Entorno Vía Láctea) 🪐": {"sigma": 310.0, "desc": "Velocidad colectiva de nuestro cúmulo inmediato de galaxias."},
+    "Escala SH0ES (Burbuja Cinemática Local) 🚀": {"sigma": 600.0, "desc": "Límite regional donde el Flujo Colectivo infla de forma máxima el H₀ aparente."},
+}
+
+seleccion = st.selectbox("🎯 Seleccionar un entorno de calibración:", list(presets_astronomicos.keys()))
+st.caption(f"ℹ️ *{presets_astronomicos[seleccion]['desc']}*")
+
+# --- PANEL DE ENTRADA (INICIA EN 0.0 POR DEFECTO) ---
+st.markdown("### 📥 Parámetro Astronómico")
+
+valor_sigma_base = presets_astronomicos[seleccion]["sigma"]
+sigma_local = st.number_input(
+    "Cizalladura Flujo Colectivo ⟨σ⟩ (Velocidad Peculiar en km/s):", 
+    value=valor_sigma_base,
+    min_value=0.0,
+    step=10.0,
+    key="sigma_input"
+)
+# --- CONSTANTES UNIVERSALES DEL MODELO DEFINITIVO ---
+H0_BASE = 67.40       # Línea base cosmológica de Planck
+SIGMA_0 = 240.0       # Escala de acoplamiento de Gaia (km/s)
+FACTOR_VACIO = 0.2723 # Subdensidad calculada de forma exacta a 50 Mpc en KBC
+BETA_QAST = 312.3     # Constante de polarizabilidad elástica del vacío
+
+# --- PROCESAMIENTO MATEMÁTICO CORE RECTIFICADO (SIN PARÁMETROS LIBRES) ---
+# La actividad es el invariante cuadrático (σ/σ₀)² amplificado por beta y la subdensidad
+actividad_exacta = BETA_QAST * (np.square(sigma_local) / np.square(SIGMA_0)) * FACTOR_VACIO
+
+# Ecuación fundamental en base 10 con el coeficiente natural ln(10) ≈ 2.302585
+COEF_NATURAL = 2.302585
+h0_calculado = H0_BASE + COEF_NATURAL * np.log10(1.0 + actividad_exacta)
+
+# --- DESPLIEGUE DE MÉTRICAS ---
+st.markdown("### 📊 Resultados de la Métrica")
+
+col1, col2 = st.columns(2)
+col1.metric("H₀ Aparente Uniforme", f"{h0_calculado:.2f} km/s/Mpc")
+col2.metric("Parámetro Actividad (A)", f"{actividad_exacta:.2f}%")
+
+# --- GRÁFICO DINÁMICO DE PROPAGACIÓN ---
+st.markdown("### Curva de Respuesta del Vacío")
+
+# Rango dinámico del gráfico ajustado para que la curva luzca fluida y estética
+x_max_grafico = max(300.0, actividad_exacta + 50.0)
+x_teorica = np.linspace(0, x_max_grafico, 500)
+y_teorica = H0_BASE + 2.302585 * np.log10(1.0 + x_teorica)
+
 fig = go.Figure()
-fig.add_trace(go.Scatter3d(
-x=v_rango, y=A_rango, z=H_rango,
-mode='lines', line=dict(color='cyan', width=4), name='Métrica Q.A.S.T.'
+
+fig.add_trace(go.Scatter(
+    x=x_teorica, 
+    y=y_teorica, 
+    mode='lines',
+    name='Respuesta del Vacío',
+    line=dict(color='#00c9ff', width=3)
 ))
-fig.add_trace(go.Scatter3d(
-x=[v_abs], y=[actividad], z=[h0_apa],
-mode='markers', marker=dict(size=12, color='red'), name='Punto de Anclaje'
+
+fig.add_trace(go.Scatter(
+    x=[actividad_exacta], 
+    y=[h0_calculado], 
+    mode='markers+text',
+    name='Target Evaluado',
+    text=[f"H₀={h0_calculado:.2f}"],
+    textposition="top left",
+    marker=dict(color='#ff4b4b', size=12, symbol='circle', line=dict(color='white', width=2))
 ))
+
 fig.update_layout(
-title=f'H0 APA: {h0_apa:.2f} | Residuo: {residuo:.2f} | A: {actividad:.2f}%',
-template='plotly_dark',
-scene=dict(
-xaxis_title='V_peculiar (km/s)',
-yaxis_title='Rotación/Actividad',
-zaxis_title='H0 APARENTE'
+    plot_bgcolor='#0e1117', 
+    paper_bgcolor='#0e1117', 
+    font_color="white",
+    xaxis_title="Actividad Cinemática (A) %",
+    yaxis_title="Constante de Hubble Aparente Uniforme (km/s/Mpc)",
+    margin=dict(l=20, r=20, t=20, b=20)
 )
-)
-fig.show()
-except Exception as e:
-print(f"Error técnico: {e}")
-if __name__ == "__main__":
-ejecutar_sistema_fighter()
 
+st.plotly_chart(fig, use_container_width=True)
 
+with left_col:
+    st.subheader("Modo de Entrada")
+    if st.button("V_peculiar"): pass
+    st.number_input("VELOCIDAD PECULIAR (KM/S)", key="vel")
+    st.divider()
+    st.write("ANCLAJE ROT.")
+    st.metric("", "240")
+
+with right_col:
+    st.subheader("Análisis Curvo de Hubble")
+    # Generar gráfico simple de ejemplo
+    x = np.linspace(0, 100, 100)
+    y = 67.4 + (2.3 * np.log10(1 + x))
+    fig = go.Figure(data=go.Scatter(x=x, y=y, mode='lines', line=dict(color='#00c9ff', width=3)))
+    fig.update_layout(plot_bgcolor='#0e1117', paper_bgcolor='#0e1117', font_color="white")
+    st.plotly_chart(fig, use_container_width=True
