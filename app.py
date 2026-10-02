@@ -113,4 +113,4 @@ with right_col:
     y = 67.4 + (2.3 * np.log10(1 + x))
     fig = go.Figure(data=go.Scatter(x=x, y=y, mode='lines', line=dict(color='#00c9ff', width=3)))
     fig.update_layout(plot_bgcolor='#0e1117', paper_bgcolor='#0e1117', font_color="white")
-    st.plotly_chart(fig, use_container_width=True
+    st.plotly_chart(fig, use_container_width=True)
